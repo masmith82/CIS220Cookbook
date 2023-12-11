@@ -17,8 +17,6 @@ DROP PROCEDURE IF EXISTS set_vegan_recipes;
 DROP PROCEDURE IF EXISTS set_carb_recipes;
 DROP PROCEDURE IF EXISTS delete_recipe;
 
-
-
 DELIMITER $$ -- temporary delimiter to take place of ;
 USE cookbook$$ 
 -- Input parameters and output parameters / create a new recipe

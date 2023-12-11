@@ -33,7 +33,7 @@ VALUES
     
 -- Create Recipes table
 CREATE TABLE recipes (
-    recipe_ID INT PRIMARY KEY,
+    recipe_ID INT AUTO_INCREMENT PRIMARY KEY,
     recipe_name VARCHAR(100),
     prep_time INT,
     cook_time INT,
@@ -59,7 +59,7 @@ VALUES
 
 -- Create Ingredients table
 CREATE TABLE ingredients (
-    ingredient_id INT PRIMARY KEY,
+    ingredient_id INT AUTO_INCREMENT PRIMARY KEY,
     ingredient_name VARCHAR(100),
     cost_per DECIMAL(10, 2),
     vegan BOOLEAN,
@@ -135,7 +135,7 @@ VALUES
 
 -- create recipe steps table
 CREATE TABLE recipe_steps (
-    recipe_id INT,
+    recipe_id AUTO_INCREMENT INT,
     step_number INT,
     ingredient_id INT,
     quantity INT,
@@ -146,7 +146,7 @@ CREATE TABLE recipe_steps (
 );
 
 -- insert recipe steps
-INSERT INTO recipe_Steps (recipe_id, step_number, ingredient_id, quantity, instructions)
+INSERT INTO recipe_steps (recipe_id, step_number, ingredient_id, quantity, instructions)
 VALUES
 -- Recipe 1: Spaghetti Aglio e Olio
     (1, 1, 1, 1, 'Boil water and cook spaghetti according to package instructions.'),
