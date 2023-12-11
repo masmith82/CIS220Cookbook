@@ -1,24 +1,36 @@
 use cookbook;
 
+DROP PROCEDURE IF EXISTS create_user;
+DROP PROCEDURE IF EXISTS get_firstName_user;
+DROP PROCEDURE IF EXISTS get_lastName_user;
+DROP PROCEDURE IF EXISTS get_email_user;
+DROP PROCEDURE IF EXISTS get_user_name;
+
+DROP PROCEDURE IF EXISTS set_lastName_user;
+DROP PROCEDURE IF EXISTS set_firstName_user;
+DROP PROCEDURE IF EXISTS set_email_user;
+DROP PROCEDURE IF EXISTS set_nickname;
+DROP PROCEDURE IF EXISTS set_firstName_user;
+DROP PROCEDURE IF EXISTS check_password;
+DROP PROCEDURE IF EXISTS search_user;
+
 DELIMITER $$ -- temporary delimiter to take place of ;
 USE cookbook$$ 
 -- Input parameters and output parameters / create user
-CREATE PROCEDURE create_user (IN f_name Varchar(50), IN l_name Varchar(50), IN email Varchar(100), IN nikname Varchar(50) )
+CREATE PROCEDURE create_user (IN f_name VARCHAR(50), IN l_name VARCHAR(50), IN email VARCHAR(100), IN nickname VARCHAR(50) )
 -- define the procedure body
 BEGIN
 	-- declare the user ID 
-	DECLARE user_id INT
-    SET user_id = 1;
-    
-    -- search the user id in the user table
-	SELECT user_id = MAX(user_ID)
-	FROM User;
-	SET user_id = user_id + 1;
+	DECLARE user_id INT;
+   
+  -- search the user id in the user table
+  SELECT MAX(user_ID) + 1 INTO user_id
+  FROM user;
     
 	-- insert the information in the table
-    INSERT INTO User (user_ID, first_name, last_name, email_address, username)
-VALUES
-    (user_id,f_name,l_name,email,nikname);
+  INSERT INTO user (user_ID, first_name, last_name, email_address, username)
+  VALUES
+    (user_id,f_name,l_name,email,nickname);
     
 SELECT 'User created!!';
 END $$
@@ -35,7 +47,7 @@ BEGIN
     SELECT	
 		first_name
     FROM
-		User
+		user
 	WHERE	 
 		user_id = userID;
     
@@ -43,7 +55,7 @@ BEGIN
 END $$
 DELIMITER ;
 
-
+-- get user's last name
 DELIMITER $$ -- temporary delimiter to take place of ;
 USE cookbook$$ 
 -- Input parameters and output parameters / return last name for a specific user
@@ -53,68 +65,64 @@ BEGIN
     SELECT	
 		last_name
     FROM
-		User
+		user
 	WHERE	 
-		user_ID = userID;
-    
-                                   
+		user_ID = userID;                                   
 END $$
 DELIMITER ;
 
+-- get user's email
 DELIMITER $$ -- temporary delimiter to take place of ;
-USE cookbook$$ 
+USE cookbook$$
 -- Input parameters and output parameters / return emil for a specific user
-CREATE PROCEDURE get_email_user (IN userID int, OUT email VARCHAR(100))
+CREATE PROCEDURE get_email_user (IN userID int, OUT email_address VARCHAR(100))
 -- define the procedure body
 BEGIN
-    SELECT	
-		email_address
-    FROM
-		User
-	WHERE	 
-		user_ID = userID;
-    
-                                   
+    SELECT email_address
+    FROM user
+    WHERE user_ID = userID;
 END $$
+
 DELIMITER ;
-
-
+    
+-- get user's nickname
 DELIMITER $$ -- temporary delimiter to take place of ;
 USE cookbook$$ 
 -- Input parameters and output parameters / return nickname for a specific user
-CREATE PROCEDURE get_email_user (IN userID int, OUT username VARCHAR(50))
+CREATE PROCEDURE get_user_name (IN userID int, OUT username VARCHAR(50))
 -- define the procedure body
 BEGIN
     SELECT	
 		username
     FROM
-		User
+		user
 	WHERE	 
 		user_ID = userID;
         
 END $$
 DELIMITER ;
 
-
+----
 -- set all the specific information from USER
+----
 
-DELIMITER $$ -- temporary delimiter to take place of ;
-USE cookbook$$ 
--- Input parameters and output parameters / set first name for a specific user
-CREATE PROCEDURE set_firstName_user (IN userID int, IN newName VARCHAR(50))
--- define the procedure body
+DROP PROCEDURE IF EXISTS set_firstName_user;
+DELIMITER $$
+USE cookbook$$
+
+CREATE PROCEDURE set_firstName_user(IN userID INT, IN newName VARCHAR(50))
 BEGIN
-	-- update the user table and set a specific user
-    UPDATE	User
-    set firt_name = newName;
+    -- update the user table and set a specific user
+    UPDATE user
+    SET first_name = newName
     WHERE user_ID = userID;
     
-    SELECT 'First name update correctly!!';
-                                   
+    SELECT 'First name updated correctly!' AS Result; 
+
 END $$
 DELIMITER ;
 
-
+-- set user's last name
 DELIMITER $$ -- temporary delimiter to take place of ;
 USE cookbook$$ 
 -- Input parameters and output parameters / set last name for a specific user
@@ -122,8 +130,8 @@ CREATE PROCEDURE set_lastName_user (IN userID int, IN new_last_name VARCHAR(50))
 -- define the procedure body
 BEGIN
     -- update the user table and set a specific user
-    UPDATE	User
-    set last_name = new_last_name;
+    UPDATE	user
+    set last_name = new_last_name
     WHERE user_ID = userID;
     
     SELECT 'Last name update correctly!!';
@@ -131,37 +139,65 @@ BEGIN
 END $$
 DELIMITER ;
 
+-- set user's email
 DELIMITER $$ -- temporary delimiter to take place of ;
 USE cookbook$$ 
--- Input parameters and output parameters / set emil for a specific user
-CREATE PROCEDURE set_email_user (IN userID int, IN email VARCHAR(100))
+-- Input parameters and output parameters / set email for a specific user
+CREATE PROCEDURE set_nickname (IN userID int, IN new_nickname VARCHAR(50))
 -- define the procedure body
 BEGIN
     -- update the user table and set a specific user
-    UPDATE	User
-    set email_address = email;
+    UPDATE	user
+    set nickname = new_nickname
     WHERE user_ID = userID;
     
-    SELECT 'Email update correctly!!';
+    SELECT 'Nickname updated!';
     
                                    
 END $$
 DELIMITER ;
 
-
+-- set user's nickname
 DELIMITER $$ -- temporary delimiter to take place of ;
 USE cookbook$$ 
 -- Input parameters and output parameters / return nickname for a specific user
-CREATE PROCEDURE get_email_user (IN userID, IN userName VARCHAR(50))
+CREATE PROCEDURE set_email_user (IN userID INT, IN new_email VARCHAR(50))
 -- define the procedure body
 BEGIN
     -- update the user table and set a specific user
-    UPDATE	User
-    set username = userName;
+    UPDATE	user
+    SET email_address = email
     WHERE user_ID = userID;
-    
-    SELECT 'Nickname update correctly!!';
-        
+
+    SELECT 'Email updated!';
+            
 END $$
 DELIMITER ;
 
+-- search user by name, returns user-ID, or -1 if user not found
+DELIMITER $$ -- temporary delimiter to take place of ;
+USE cookbook$$
+-- Input parameters and output parameters / return nickname for a specific user
+CREATE PROCEDURE search_user(IN userName VARCHAR(50), OUT found_user INT)
+
+BEGIN
+    SELECT user_ID INTO found_user FROM user WHERE username = userName;
+END $$
+
+DELIMITER ;
+
+-- check password
+DELIMITER $$ -- temporary delimiter to take place of ;
+USE cookbook$$
+-- Input parameters and output parameters / return nickname for a specific user
+CREATE PROCEDURE check_password (IN pword VARCHAR(50), OUT valid TINYINT)
+
+BEGIN
+    SET valid = 0;
+
+    -- check password, returns 1 if password matches, else returns 0
+    IF (password = pword) THEN
+        SET valid = 1;
+    END IF;
+END $$
+DELIMITER ;

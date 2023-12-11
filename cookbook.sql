@@ -13,13 +13,14 @@ CREATE TABLE user (
     first_name VARCHAR(50),
     last_name VARCHAR(50),
     email_address VARCHAR(100) UNIQUE,
-    username VARCHAR(50) UNIQUE
+    username VARCHAR(50) UNIQUE,
+    pass VARCHAR(50)
 );
 
 -- insert dummy users
 INSERT INTO user (user_ID, first_name, last_name, email_address, username, pass)
 VALUES
-    (1, 'John', 'Doe', 'john.doe@email.com', 'realjohndoe_1985', 'password'),
+    (1, 'John', 'Doe', 'john.doe@email.com', 'jd', 'password'),
     (2, 'Jane', 'Smith', 'jane.smith@email.com', 'js_smith_1990', 'password'),
     (3, 'Bob', 'Johnson', 'bob.johnson@email.com', 'bob_j_1988', 'password'),
     (4, 'Alice', 'Williams', 'alice.williams@email.com', 'alice_w_1992', 'password'),
@@ -201,3 +202,7 @@ VALUES
     (10, 1, 10, 3, 'Dice tomatoes and basil. Mix with olive oil and garlic.'),
     (10, 2, 6, 1, 'Grate Parmesan cheese.'),
     (10, 3, 4, 2, 'Slice baguette, toast, and top with tomato mixture and Parmesan.');
+
+SOURCE cookbook_user_procedure_queries.sql
+SOURCE cookbook_recipes_procedure_queries.sql
+SOURCE cookbook_ingredient_procedure_queries.sql
