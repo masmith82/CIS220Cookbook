@@ -4,7 +4,7 @@ import sys
 # Database connection parameters
 HOSTNAME = "localhost"
 USERNAME = "root"
-PASSWORD = "MJw!0TeN!0"
+PASSWORD = None
 DATABASE = "cookbook"
 
 # Define a function to display the main menu
@@ -293,7 +293,7 @@ def show_ingredients():
         print(f"name: {row[1]}")
         print(f"cost: {row[2]}")
         print(f"vegan: {row[3]}")
-        print(f"carb: {row[4]}")
+        print(f"carb: {row[4]}\n")
 
     # close the conection
     connection.close()
