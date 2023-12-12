@@ -316,6 +316,7 @@ usuarioID = None
 
 # We define a variable to store the nickname
 nickname = None
+connect()
 
 # main loop
 while True:

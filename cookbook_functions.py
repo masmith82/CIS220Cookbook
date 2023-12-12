@@ -5,7 +5,6 @@ from cookbook_menus import validate_input, validate_quantity
 # Database connection parameters
 HOSTNAME = "localhost"
 USERNAME = "root"
-PASSWORD = "MJw!0TeN!0"
 DATABASE = "cookbook"
 
 # global variable to hold the database connection
@@ -19,17 +18,17 @@ connection = None
 # JORGE: I put this into it's own function and set up 'connection' as a global variable, so any function can use it
 def connect() -> mysql.connector.connect:
     global connection
-
+    passw = input("Enter sql password: ")
     try:
-        connection = mysql.connector.connect(
-            host = HOSTNAME, user = USERNAME, password = PASSWORD, database = DATABASE
+        connector = mysql.connector.connect(
+            host = HOSTNAME, user = USERNAME, password = passw, database = DATABASE
         )
-        return connection
+        connection = connector
+        return connector
     except Exception as error:
         print(f"Error connecting to the database: {error}")
         sys.exit()
 
-connection = connect()
 
 ###################
 # USER VALIDATION #
