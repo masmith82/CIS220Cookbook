@@ -78,7 +78,8 @@ VALUES
     (7, 'Bell Pepper', 1.99, true, true),
     (8, 'Salmon Fillet', 9.99, false, true),
     (9, 'Penne Pasta', 1.49, false, false),
-    (10, 'Tomatoes', 3.99, true, true);
+    (10, 'Tomatoes', 3.99, true, true),
+    (11, 'Eggs', 0.10, false, true);
 
 -- create user ingredients table
 CREATE TABLE user_has_ingredients (
@@ -191,9 +192,9 @@ VALUES
 
 -- Recipe 6: Omelette
 
-    (6, 8, 1, 'Season salmon fillet and bake in the oven.'),
-    (6, 1, 2, 'Whisk eggs and pour into a hot, greased pan.'),
-    (6, 8, 1, 'Flake baked salmon into the omelette. Fold and serve.'),
+    (6, 11, 2, 'Season salmon fillet and bake in the oven.'),
+    (6, 11, 2, 'Whisk eggs and pour into a hot, greased pan.'),
+    (6, 11, 2, 'Flake baked salmon into the omelette. Fold and serve.'),
 
 -- Recipe 7: Greek Salad
 

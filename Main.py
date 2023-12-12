@@ -37,7 +37,7 @@ def create_new_user():
     new_email = input("Enter your email: ")
     new_username = input("Enter your username: ")
     new_password = input("Choose a password: ")
-    value = create_user(new_first_name, new_last_name, new_email, new_username, new_password)
+    create_user(new_first_name, new_last_name, new_email, new_username, new_password)
 
 # user menu, displays after login
 def user_menu():
@@ -208,8 +208,8 @@ def recipe_menu():
             recipe_id = validate_input(int(input("Enter the recipe ID to display: ")))
             list_recipe_detail(recipe_id)
 
-        elif option == 5:                   # show recipe detail
-            print("NYI")
+        elif option == 5:                   # show filtered recipe
+            recipe_filter_menu()
 
         elif option == 6:                   # delete recipe
             num_recipe_ID = int(input("Enter the recipe ID to delete: "))
@@ -217,6 +217,29 @@ def recipe_menu():
         
         elif option == 7:                   # return to user menu
             break
+
+def recipe_filter_menu():
+    while True:
+        show_recipe_filter_menu()
+        option = int(input("Choose an option: "))
+        
+        if option == 1:                        # show recipes I can make with my ingredients
+            filter_by_my_ingredients(current_user)
+        elif option == 2:                       # show recipes within a calorie per serving limit
+            calorie_limit = int(input("Enter the calorie limit: "))
+            filter_by_calories(calorie_limit)
+        elif option == 3:                       # show recipes within a total time limit
+            time_limit = int(input("Enter the time limit: "))
+            filter_by_time(time_limit)
+        elif option == 4:                       # show vegan recipes
+            basic_recipe_filter(1)
+        elif option == 5:                       # show low-carb recipes
+            basic_recipe_filter(2)
+        elif option == 6:                       # show low-carb vegan recipes
+            basic_recipe_filter(3)
+        elif option == 7:
+            break
+
 
 # menu for modifying recipes
 def modify_recipe_menu():

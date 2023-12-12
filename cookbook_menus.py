@@ -74,9 +74,19 @@ def show_modify_ingredients_MENU():
   print("\n** MODIFY INGREDIENTS MENU **")
   print("1) Modify the ingredient name")
   print("2) Modify the ingredient cost")
-  print("3) Modify the ingredient vegan")
-  print("4) Modify the ingredient carb")
+  print("3) Set vegan status")
+  print("4) Set low-carb status")
   print("5) Back\n")
+
+def show_recipe_filter_menu():
+  print("\n** RECIPE FILTER MENU **")
+  print("1) Show recipes I can make with my ingredients")
+  print("2) Show recipes within a calorie per serving limit")
+  print("3) Show recipes within a prep time limit")
+  print("4) Show vegan recipes")
+  print("5) Show low-carb recipes")
+  print("6) Show low-carb vegan recipes")
+  print("7) Back\n")
 
 # We define a function to display the modify recipe menu
 def show_modify_recipe_MENU():

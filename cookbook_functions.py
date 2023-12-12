@@ -61,9 +61,21 @@ def get_user_id(username):
     result = cursor.fetchone()
     return result[0]
 
-###################################
-# DATABASE MANIPULATION FUNCTIONS #
-###################################
+########################
+# INGREDIENT FUNCTIONS #
+########################
+
+# show all ingredients
+def show_ingredients():
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM ingredients")
+
+    # Iterar sobre los resultados
+    print("\nIngredient List")
+    print("=" * 60)
+    for row in cursor:
+        print(f"id: {row[0]:<3} - {row[1]:<20} cost: ${row[2]:<10} vegan: {parse_bool(row[3]):<5} low carb: {parse_bool(row[4]):<5}")
+    print("\n")
 
 # show's ingredients in a user's stock
 def show_user_ingredients(current_user):
@@ -86,20 +98,6 @@ def add_ingredient_to_stock(current_user):
     connection.commit()
     print("\n")
 
-# Define the function to show the ingredients
-def show_ingredients():
-    cursor = connection.cursor()
-
-    # call the ingredients from the cookbook
-
-    cursor.execute("SELECT * FROM ingredients")
-
-    # Iterar sobre los resultados
-    print("\nIngredient List")
-    print("=" * 60)
-    for row in cursor:
-        print(f"id: {row[0]:<3} - {row[1]:<20} cost: ${row[2]:<10} vegan: {parse_bool(row[3]):<5} low carb: {parse_bool(row[4]):<5}")
-    print("\n")
 
 # helper function to replace 1 and 0 with Y and N
 def parse_bool(value):
@@ -132,6 +130,9 @@ def insert_ingredient(name, cost, vegan, carb):
         print(f"Error inserting ingredient: {error}")
         return None
 
+#####################################
+# INGREDIENT MODIFICATION FUNCTIONS #
+#####################################
 
 # Define the function to set_ingredient_name 
 def set_ingredient_name( ingredient_id, i_name):
@@ -232,6 +233,9 @@ def delete_ingredient( ingredient_id):
     except Exception as error:
         print(f"Error deleting ingredient: {error}")
 
+####################
+# RECIPE FUNCTIONS #
+####################
 
 def list_recipes():
         cursor = connection.cursor()
@@ -265,6 +269,55 @@ def list_recipe_detail(recipe_id):
         print("\n")
         get_recipe_steps(recipe_id)
 
+
+# Define the function to insert a new ingredient
+def insert_recipe(name, p_time, c_time, diff_level, cal, vegan, carb):
+    try:
+        # Connect to the database
+        cursor = connection.cursor()
+
+        query = """
+            INSERT INTO recipes (recipe_name, prep_time, cook_time, difficulty_level, calories_per_serving, vegan, low_carb)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """
+
+        if not name or not name.strip():
+            raise ValueError("Invalid first name")
+        # ... (Perform similar validation for other inputs)
+
+        # Execute the query with user-provided data
+        cursor.execute(query, (name, p_time, c_time, diff_level, cal, vegan, carb))
+        connection.commit()
+        print("\nRecipe created successfully!\n")
+
+    except Exception as error:
+        print(f"Error inserting recipe: {error}")
+        return None
+
+
+# delete a recipe
+def delete_recipe(id):
+    try:
+        cursor = connection.cursor()
+
+        # Execute the stored procedure
+        cursor.callproc("delete_recipe", (id))
+
+        # Fetch the result
+        result = cursor.fetchone()
+
+        # Commit the changes and close the connection
+        connection.commit()
+
+    except Exception as error:
+        print(f"Error delete a recipe: {error}")
+        return None
+
+
+#########################
+# RECIPE STEP FUNCTIONS #
+##########################
+
 def get_recipe_steps(recipe_id):
     cursor = connection.cursor()
     query = """
@@ -280,7 +333,8 @@ def get_recipe_steps(recipe_id):
             row[1] = "None"
         print(f"Step {step}:\n=======\nIngredients used: {row[1]} x {row[2]}\nInstructions: {row[3]}")
         step += 1                    # increment the step number, this is because step_number in the database my not be sequential due to how AUTO_INCREMENT works
-        
+
+  
 def add_recipe_step(recipe_id):
     cursor = connection.cursor()
     list_recipe_detail(recipe_id)
@@ -313,31 +367,120 @@ def delete_recipe_step(recipe_id, step_number):
         
     except Exception as error:
         print(f"Error deleting recipe step: {error}")
-    
-# Define the function to insert a new ingredient
-def insert_recipe(name, p_time, c_time, diff_level, cal, vegan, carb):
-    try:
-        # Connect to the database
-        cursor = connection.cursor()
+  
+###########################
+# RECIPE FILTER FUNCTIONS #
+###########################
 
+# simple filters for vegan and low carb options
+def basic_recipe_filter(type):
+    title = ""
+    if type == 1:
+        title = "\nVegan Recipes"
         query = """
-            INSERT INTO recipes (recipe_name, prep_time, cook_time, difficulty_level, calories_per_serving, vegan, low_carb)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            SELECT recipe_id, recipe_name FROM recipes
+            WHERE vegan = 1
+        """
+    if type == 2:
+        title = "\nLow-Carb Recipes"
+        query = """
+            SELECT recipe_id, recipe_name FROM recipes
+            WHERE low_carb = 1
+        """
+    if type == 3:
+        title = "\nLow-Carb Vegan Recipes"
+        query = """
+            SELECT recipe_id, recipe_name FROM recipes
+            WHERE low_carb = 1 AND vegan = 1
         """
 
-        if not name or not name.strip():
-            raise ValueError("Invalid first name")
-        # ... (Perform similar validation for other inputs)
+    cursor = connection.cursor()
+    cursor.execute(query)
+    print(title)
+    print("=" * 30)
+    for row in cursor:
+        print(f"{row[0]:<3} - {row[1]:<20}")
+        
+def filter_by_calories(calories):
+    query = """
+        SELECT recipe_id, recipe_name FROM recipes
+        WHERE calories_per_serving <= %s
+    """
+    cursor = connection.cursor()
+    cursor.execute(query, (calories,))
+    print("\nRecipes with less than " + str(calories) + " calories per serving:")
+    print("=" * 60)
+    results = cursor.fetchall()
+    for row in results:
+        query = """
+            SELECT calories_per_serving FROM recipes
+            WHERE recipe_id = %s
+        """
+        cursor.execute(query, (row[0],))
+        for subrow in cursor:
+            print(f"{row[0]:<3} - {row[1]:<30} | Calories: {subrow[0]}")
+        
+# filter by total prep + cook time
+def filter_by_time(time):
+    query = """
+        SELECT recipe_id, recipe_name FROM recipes
+        WHERE prep_time + cook_time <= %s
+    """
+    cursor = connection.cursor()
+    cursor.execute(query, (time,))
+    print("\nRecipes that can be made in under " + str(time) + " minutes total:")
+    print("=" * 60)
+    results = cursor.fetchall()
+    for row in results:       
+        query = """
+            SELECT prep_time, cook_time, SUM(prep_time + cook_time) FROM recipes
+            WHERE recipe_id = %s
+        """
+        cursor.execute(query, (row[0],))
+        for subrow in cursor:
+            print(f"{row[0]:<3} - {row[1]:<30} | Prep Time: {subrow[0]} | Cook Time: {subrow[1]} | Total Time: {subrow[2]}")
 
-        # Execute the query with user-provided data
-        cursor.execute(query, (name, p_time, c_time, diff_level, cal, vegan, carb))
-        connection.commit()
-        print("\nRecipe created successfully!\n")
+def filter_by_my_ingredients(current_user):
+    cursor = connection.cursor()
+    query = """
+        SELECT DISTINCT R.recipe_id, R.recipe_name, R.prep_time, R.cook_time, R.difficulty_level, R.calories_per_serving, R.vegan, R.low_carb
+        FROM recipes R
+        JOIN
+            (SELECT RS.recipe_id, I.ingredient_id, SUM(RS.quantity) AS total_required
+                FROM recipe_steps RS
+                JOIN ingredients I ON RS.ingredient_id = I.ingredient_id
+                GROUP BY RS.recipe_id, I.ingredient_id)
+        AS RecipeTotal ON R.recipe_id = RecipeTotal.recipe_id
+        JOIN recipe_steps RS ON R.recipe_id = RS.recipe_id
+        JOIN ingredients I ON RS.ingredient_id = I.ingredient_id
+        JOIN user_has_ingredients UI ON I.ingredient_id = UI.ingredient_id
+        WHERE
+            UI.user_id = %s
+        GROUP BY
+            R.recipe_ID
+        HAVING
+            COUNT(*) = COUNT(CASE WHEN UI.quantity >= RecipeTotal.total_required THEN 1 END);
+        """
+    cursor.execute(query, (current_user,))
+    print("\nRecipes I can make with my ingredients:")
+    print("=" * 60)
+    results = cursor.fetchall()
+    for row in results:
+        query = """
+            SELECT DISTINCT i.ingredient_name, rs.quantity FROM ingredients i
+            JOIN recipe_steps rs ON i.ingredient_id = rs.ingredient_id
+            WHERE rs.recipe_id = %s
+        """
+        cursor.execute(query, (row[0],))
+        print(f"\nRecipe ID: {row[0]:<2} - {row[1]:<30}")
+        print(f"Ingrdients needed:")
+        for subrow in cursor:
+            print(f"{'':<3} - {subrow[0]:<30} x {subrow[1]}")
+        
+#################################
+# RECIPE MODIFICATION FUNCTIONS #
+#################################
 
-    except Exception as error:
-        print(f"Error inserting recipe: {error}")
-        return None
-    
 # set the recipe name
 def set_recipe_name(id, name):
     try:
@@ -468,25 +611,12 @@ def set_carb_recipes(id, carb):
         print(f"Error seting carb in recipe: {error}")
         return None
 
-# delete a recipe
-def delete_recipe(id):
-    try:
-        cursor = connection.cursor()
 
-        # Execute the stored procedure
-        cursor.callproc("delete_recipe", (id))
+##################
+# USER FUNCTIONS #
+##################   
 
-        # Fetch the result
-        result = cursor.fetchone()
-
-        # Commit the changes and close the connection
-        connection.commit()
-
-    except Exception as error:
-        print(f"Error delete a recipe: {error}")
-        return None
-
-# Define the function to insert a new ingredient
+# Define the function to insert a new user
 def create_user(first_name, last_name, email_address, username, passw = "password"):
     try:
         print("Creating")
