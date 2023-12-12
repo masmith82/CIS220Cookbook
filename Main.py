@@ -26,7 +26,7 @@ def login():
     if userID and passw:
         print("\nLogin successful. \nWelcome, " + userID + "!\n")
         global current_user
-        current_user= get_user_id(userID)
+        current_user = get_user_id(userID)      # store current user_id (INT) for this session
         user_menu()
 
 
@@ -52,13 +52,20 @@ def user_menu():
         elif option == 3:
             break                           # exit to main menu
 
+
 # menu to manage ingredients
 def ingredient_menu():
     while True:
         show_ingredients_MENU()
-
         option_ingredients = validate_input(input("Enter an option: "))
-        if option_ingredients == 1:         # add ingredient
+        
+        if option_ingredients == 1:         # add ingredient to user stock
+            show_user_ingredients(current_user)
+
+        if option_ingredients == 2:         # add ingredient to user stock
+            add_ingredient_to_stock(current_user)
+
+        if option_ingredients == 3:         # add ingredient
             # Enter the ingredient cost 
             ing_add_id = int(input("Enter the ingredient id: "))
             # Enter the ingredient name
@@ -80,21 +87,21 @@ def ingredient_menu():
             # call the procedure insert_ingredient
             value = insert_ingredient(ing_add_id, ing_add_name, ing_add_cost, ing_add_veg, ing_add_veg)
 
-        elif option_ingredients == 2:           # modify ingredient submenu
+        elif option_ingredients == 4:           # modify ingredient submenu
             modify_ingredients_menu()
 
-        elif option_ingredients == 3:           # delete ingredient
+        elif option_ingredients == 5:           # delete ingredient
             # select what ingredient do you want to delete
             #enter the ingredient ID
             delete_ing_ID = int(input("Enter the ingredient ID: "))
             # enter the code to delete the ingredient here 
             delete_ingredient(delete_ing_ID)
 
-        elif option_ingredients == 4:           # show user's ingredients
+        elif option_ingredients == 6:           # show full list of available ingredients
             # show the list of all the ingredients here 
             value = show_ingredients()
 
-        elif option_ingredients == 5:           # back to user menu
+        elif option_ingredients == 7:           # back to user menu
         # back to the before menu
             break
 

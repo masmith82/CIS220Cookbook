@@ -32,17 +32,18 @@ def show_user_menu():
     print("** MAIN USER MENU **")
     print("1) Ingredients")
     print("2) Recipes")
-    print("3) Steps")
-    print("4) Exit")
+    print("3) Exit")
 
 # We define a function to display the ingredients menu
 def show_ingredients_MENU():
   print("** INGREDIENTS MENU **")
-  print("1) Add ingredient")
-  print("2) Modify ingredients")
-  print("3) Delete ingredints")
-  print("4) show ingredients list")
-  print("5) Back")
+  print("1) Show your ingredient stock")
+  print("2) Add ingredient to your stock")
+  print("3) Create new custom ingredient")
+  print("4) Modify ingredients")
+  print("5) Delete ingredints")
+  print("6) Show ingredients list")
+  print("7) Back")
 
 # We define a function to display the recipe menu
 def show_recipe_MENU():

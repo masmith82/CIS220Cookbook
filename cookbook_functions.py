@@ -1,5 +1,6 @@
 import mysql.connector
 import sys
+from cookbook_menus import validate_input
 
 # Database connection parameters
 HOSTNAME = "localhost"
@@ -15,7 +16,7 @@ connection = None
 ########################
 
 # Connect to the database
-# JORGE: Put this into it's own function and set up 'connection' as a global variable, so any function can use it
+# JORGE: I put this into it's own function and set up 'connection' as a global variable, so any function can use it
 def connect() -> mysql.connector.connect:
     global connection
 
@@ -95,10 +96,6 @@ def insert_ingredient(id, name, cost, vegan, carb):
 def set_ingredient_name( ingredientID, i_name):
 
     try:
-        # Connect to the database
-        connection = mysql.connector.connect(
-            host=HOSTNAME, user=USERNAME, password=PASSWORD, database= DATABASE
-        )
         cursor = connection.cursor()
 
         # Execute the stored procedure
@@ -168,10 +165,6 @@ def set_vegan_ingredient( ingredientID, vegan):
 def set_carb_ingredient( ingredientID, carb):
 
     try:
-        # Connect to the database
-        connection = mysql.connector.connect(
-            host=HOSTNAME, user=USERNAME, password=PASSWORD, database= DATABASE
-        )
         cursor = connection.cursor()
 
         # Execute the stored procedure
@@ -211,10 +204,6 @@ def delete_ingredient( ingredientID):
 def insert_recipe_step(recipe_id, step_number, ingredient_id, quantity, instructions):
 
     try:
-        # Connect to the database
-        connection = mysql.connector.connect(
-            host=HOSTNAME, user=USERNAME, password=PASSWORD, database= DATABASE
-        )
         cursor = connection.cursor()
 
         query = """
@@ -239,12 +228,27 @@ def insert_recipe_step(recipe_id, step_number, ingredient_id, quantity, instruct
         print(f"Error inserting recipe step: {error}")
         return None
 
+# show's ingredients in a user's stock
+def show_user_ingredients(current_user):
+    cursor = connection.cursor()
+    cursor.callproc('show_user_ingredients', (current_user, ))
+    for result in cursor.stored_results():
+        print(f"\n{'Ingredient':<15} {'Quantity'}")
+        print("=" * 30)
+        for row in result.fetchall():
+            print(f"{row[0]:<15} {row[1]}")
+    print("\n")
+
+# adds a quantity of ingredient to a user's stock
+def add_ingredient_to_stock(current_user):
+    cursor = connection.cursor()
+    show_ingredients()
+    ingredient_id = validate_input(input("Enter the ingredient ID to add: "))
+    ingedient_quantity = validate_input(input("Enter the quantity to add: "))
+    cursor.callproc('add_ingredient_to_stock', (current_user, ingredient_id, ingedient_quantity))
+
 # Define the function to show the ingredients
 def show_ingredients():
-    # made the conection with the DB
-    connection = mysql.connector.connect(
-        host = HOSTNAME, user = USERNAME, password = PASSWORD, database = DATABASE
-    )
     cursor = connection.cursor()
 
     # call the ingredients from the cookbook
@@ -252,18 +256,21 @@ def show_ingredients():
     cursor.execute("SELECT * FROM ingredients")
 
     # Iterar sobre los resultados
+    print("\nIngredient List")
+    print("=" * 60)
     for row in cursor:
-        # Imprimir los datos del usuario
-        print(f"id: {row[0]}")
-        print(f"name: {row[1]}")
-        print(f"cost: {row[2]}")
-        print(f"vegan: {row[3]}")
-        print(f"carb: {row[4]}\n")
+        print(f"id: {row[0]:<3} - {row[1]:<20} cost: ${row[2]:<10} vegan: {parse_bool(row[3]):<5} low carb: {parse_bool(row[4]):<5}")
+    print("\n")
 
+# helper function to replace 1 and 0 with Y and N
+def parse_bool(value):
+    if value == 1:
+        return "Y"
+    else:
+        return "N"
 
 # Define the function to insert a new ingredient
 def insert_recipe(id, name, p_time, c_time, diff_level, cal, vegan, carb):
-
     try:
         # Connect to the database
         cursor = connection.cursor()
@@ -290,12 +297,7 @@ def insert_recipe(id, name, p_time, c_time, diff_level, cal, vegan, carb):
     
 # set the recipe name
 def set_recipe_name(id, name):
-
     try:
-        # Connect to the database
-        connection = mysql.connector.connect(
-            host=HOSTNAME, user=USERNAME, password=PASSWORD, database= DATABASE
-        )
         cursor = connection.cursor()
 
         # Execute the stored procedure
@@ -315,10 +317,6 @@ def set_recipe_name(id, name):
 def set_prepTime_recipes(id, p_time):
 
     try:
-        # Connect to the database
-        connection = mysql.connector.connect(
-            host=HOSTNAME, user=USERNAME, password=PASSWORD, database= DATABASE
-        )
         cursor = connection.cursor()
 
         # Execute the stored procedure
@@ -337,7 +335,6 @@ def set_prepTime_recipes(id, p_time):
 
 # set the cook time
 def set_cookTime_recipes(id, c_time):
-
     try:
         cursor = connection.cursor()
 
@@ -357,7 +354,6 @@ def set_cookTime_recipes(id, c_time):
 
 # set the difficult level
 def set_diffLevel_recipes(id, level):
-
     try:
         cursor = connection.cursor()
 
@@ -376,7 +372,6 @@ def set_diffLevel_recipes(id, level):
 
 # set the calories per serving
 def set_calories_per_serving_recipes(id, cal):
-
     try:
         cursor = connection.cursor()
 
@@ -395,7 +390,6 @@ def set_calories_per_serving_recipes(id, cal):
 
 # set the vegan
 def set_vegan_recipes(id, veg):
-
     try:
         cursor = connection.cursor()
 
@@ -415,7 +409,6 @@ def set_vegan_recipes(id, veg):
 
 # set the carb
 def set_carb_recipes(id, carb):
-
     try:
         # Connect to the database
         cursor = connection.cursor()

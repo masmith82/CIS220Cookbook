@@ -135,7 +135,7 @@ VALUES
 
 -- create recipe steps table
 CREATE TABLE recipe_steps (
-    recipe_id AUTO_INCREMENT INT,
+    recipe_id INT AUTO_INCREMENT,
     step_number INT,
     ingredient_id INT,
     quantity INT,

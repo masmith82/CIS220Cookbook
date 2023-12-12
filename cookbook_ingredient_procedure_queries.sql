@@ -1,5 +1,7 @@
 use cookbook;
 
+DROP PROCEDURE IF EXISTS show_user_ingredients;
+DROP PROCEDURE IF EXISTS add_ingredient_to_stock;
 DROP PROCEDURE IF EXISTS create_ingredient;
 DROP PROCEDURE IF EXISTS insert_ingredient;
 DROP PROCEDURE IF EXISTS get_ingredient_name;
@@ -12,6 +14,43 @@ DROP PROCEDURE IF EXISTS set_vegan_ingredient;
 DROP PROCEDURE IF EXISTS set_carb_ingredient;
 DROP PROCEDURE IF EXISTS delete_ingredient;
 
+
+
+DELIMITER $$ -- temporary delimiter to take place of ;
+USE cookbook$$ 
+-- Input parameters and output parameters / insert ingredients
+CREATE PROCEDURE show_user_ingredients (IN user_id INT)
+BEGIN
+
+-- query to return all ingredients owned by a given user
+SELECT
+    i.ingredient_name,
+    ui.quantity
+FROM
+    user u
+JOIN
+    user_has_ingredients ui ON u.user_ID = ui.user_id
+JOIN
+    ingredients i ON ui.ingredient_id = i.ingredient_id
+WHERE u.user_ID = user_id;
+
+END $$
+DELIMITER ;
+
+DELIMITER $$ -- temporary delimiter to take place of ;
+USE cookbook$$ 
+-- Input parameters and output parameters / insert ingredients
+CREATE PROCEDURE add_ingredient_to_stock (IN user_id INT, IN ingredient_id INT, IN quantity INT)
+BEGIN
+    
+	-- insert the information in the table
+INSERT INTO user_has_ingredients (user_id, ingredient_id, quantity)
+  VALUES (user_id, ingredient_id, quantity)
+  ON DUPLICATE KEY UPDATE
+    quantity = quantity + VALUES(quantity);
+
+END $$
+DELIMITER ;
 
 DELIMITER $$ -- temporary delimiter to take place of ;
 USE cookbook$$ 
