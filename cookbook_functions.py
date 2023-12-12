@@ -150,10 +150,6 @@ def set_ingredient_name( ingredient_id, i_name):
 def set_cost_ingredient( ingredient_id, cost):
 
     try:
-        # Connect to the database
-        connection = mysql.connector.connect(
-            host=HOSTNAME, user=USERNAME, password=PASSWORD, database= DATABASE
-        )
         cursor = connection.cursor()
 
         # Execute the stored procedure
@@ -175,10 +171,6 @@ def set_cost_ingredient( ingredient_id, cost):
 def set_vegan_ingredient( ingredient_id, vegan):
 
     try:
-        # Connect to the database
-        connection = mysql.connector.connect(
-            host=HOSTNAME, user=USERNAME, password=PASSWORD, database= DATABASE
-        )
         cursor = connection.cursor()
 
         # Execute the stored procedure
