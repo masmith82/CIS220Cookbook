@@ -24,11 +24,11 @@ BEGIN
 	DECLARE user_id INT;
    
   -- search the user id in the user table
-  SELECT MAX(user_ID) + 1 INTO user_id
+  SELECT MAX(user_id) + 1 INTO user_id
   FROM user;
     
 	-- insert the information in the table
-  INSERT INTO user (user_ID, first_name, last_name, email_address, username)
+  INSERT INTO user (user_id, first_name, last_name, email_address, username)
   VALUES
     (user_id,f_name,l_name,email,nickname);
     
@@ -67,7 +67,7 @@ BEGIN
     FROM
 		user
 	WHERE	 
-		user_ID = userID;                                   
+		user_id = userID;                                   
 END $$
 DELIMITER ;
 
@@ -80,7 +80,7 @@ CREATE PROCEDURE get_email_user (IN userID int, OUT email_address VARCHAR(100))
 BEGIN
     SELECT email_address
     FROM user
-    WHERE user_ID = userID;
+    WHERE user_id = userID;
 END $$
 
 DELIMITER ;
@@ -97,7 +97,7 @@ BEGIN
     FROM
 		user
 	WHERE	 
-		user_ID = userID;
+		user_id = userID;
         
 END $$
 DELIMITER ;
@@ -115,7 +115,7 @@ BEGIN
     -- update the user table and set a specific user
     UPDATE user
     SET first_name = newName
-    WHERE user_ID = userID;
+    WHERE user_id = userID;
     
     SELECT 'First name updated correctly!' AS Result; 
 
@@ -132,7 +132,7 @@ BEGIN
     -- update the user table and set a specific user
     UPDATE	user
     set last_name = new_last_name
-    WHERE user_ID = userID;
+    WHERE user_id = userID;
     
     SELECT 'Last name update correctly!!';
                                    
@@ -149,7 +149,7 @@ BEGIN
     -- update the user table and set a specific user
     UPDATE	user
     set nickname = new_nickname
-    WHERE user_ID = userID;
+    WHERE user_id = userID;
     
     SELECT 'Nickname updated!';
     
@@ -167,7 +167,7 @@ BEGIN
     -- update the user table and set a specific user
     UPDATE	user
     SET email_address = email
-    WHERE user_ID = userID;
+    WHERE user_id = userID;
 
     SELECT 'Email updated!';
             
@@ -181,7 +181,7 @@ USE cookbook$$
 CREATE PROCEDURE search_user(IN userName VARCHAR(50), OUT found_user INT)
 
 BEGIN
-    SELECT user_ID INTO found_user FROM user WHERE username = userName;
+    SELECT user_id INTO found_user FROM user WHERE username = userName;
 END $$
 
 DELIMITER ;

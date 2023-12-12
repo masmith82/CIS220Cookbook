@@ -1,5 +1,6 @@
 use cookbook;
 
+DROP PROCEDURE IF EXISTS add_recipe_step;
 DROP PROCEDURE IF EXISTS create_recipe;
 DROP PROCEDURE IF EXISTS get_recipe_name;
 DROP PROCEDURE IF EXISTS get_prepTime_recipes;
@@ -17,6 +18,21 @@ DROP PROCEDURE IF EXISTS set_vegan_recipes;
 DROP PROCEDURE IF EXISTS set_carb_recipes;
 DROP PROCEDURE IF EXISTS delete_recipe;
 
+DELIMITER $$
+USE cookbook$$
+CREATE PROCEDURE add_recipe_step (IN recipe_id INT, IN ingredient_id INT, IN step_description VARCHAR(1000))
+BEGIN
+  DECLARE step_number INT;
+  SELECT IFNULL(MAX(step_number), 0) + 1 INTO step_number
+  FROM recipe_steps
+  WHERE recipe_id = recipe_id;
+
+  INSERT INTO recipe_steps (recipe_id, step_number, ingredient_id, instructions)
+  VALUES (recipe_id, step_number, ingredient_id, step_description);
+END $$
+
+DELIMITER ;
+
 DELIMITER $$ -- temporary delimiter to take place of ;
 USE cookbook$$ 
 -- Input parameters and output parameters / create a new recipe
@@ -26,11 +42,11 @@ BEGIN
 	-- declare the ingredient_Id 
 	DECLARE ID INT;  
     -- search the user id in the user table
-	SELECT MAX(recipe_ID) + 1 INTO ID
+	SELECT MAX(recipe_id) + 1 INTO ID
 	FROM recipes;
     
 	-- insert the information in the table
-    INSERT INTO recipes (recipe_ID, recipe_name, prep_time, cook_time, difficulty_level, calories_per_serving, vegan, low_carb)
+    INSERT INTO recipes (recipe_id, recipe_name, prep_time, cook_time, difficulty_level, calories_per_serving, vegan, low_carb)
 VALUES
     (ID, rec_name, p_time, c_time, diff_level, calories, veg, carb);
     
@@ -52,7 +68,7 @@ BEGIN
     FROM
 		recipes
 	WHERE	 
-		recipe_ID = recipeID;
+		recipe_id = recipeID;
                                      
 END $$
 DELIMITER ;
@@ -69,7 +85,7 @@ BEGIN
     FROM
 		recipes
 	WHERE	 
-		recipe_ID = recipeID;
+		recipe_id = recipeID;
                                      
 END $$
 DELIMITER ;
@@ -85,7 +101,7 @@ BEGIN
     FROM
 		recipes
 	WHERE	 
-		recipe_ID = recipeID;
+		recipe_id = recipeID;
                                      
 END $$
 DELIMITER ;
@@ -101,7 +117,7 @@ BEGIN
     FROM
 		recipes
 	WHERE	 
-		recipe_ID = recipeID;
+		recipe_id = recipeID;
                                      
 END $$
 DELIMITER ;
@@ -117,7 +133,7 @@ BEGIN
     FROM
 		recipes
 	WHERE	 
-		recipe_ID = recipeID;
+		recipe_id = recipeID;
                                      
 END $$
 DELIMITER ;
@@ -133,7 +149,7 @@ BEGIN
     FROM
 		recipes
 	WHERE	 
-		recipe_ID = recipeID;
+		recipe_id = recipeID;
                                      
 END $$
 DELIMITER ;
@@ -149,7 +165,7 @@ BEGIN
     FROM
 		recipes
 	WHERE	 
-		recipe_ID = recipeID;
+		recipe_id = recipeID;
                                      
 END $$
 DELIMITER ;
@@ -166,7 +182,7 @@ BEGIN
     -- update the Ingredients table and set a specific ingredient
     UPDATE	recipes
     SET recipe_name = newname
-    WHERE recipe_ID = recipeID;
+    WHERE recipe_id = recipeID;
     
     SELECT 'Recipe name update correctly!';
                                      
@@ -182,7 +198,7 @@ BEGIN
     -- update the Ingredients table and set a specific ingredient
     UPDATE	recipes
     set prep_time = pTime
-    WHERE recipe_ID = recipeID;
+    WHERE recipe_id = recipeID;
     
     SELECT 'Prep time update correctly!!';
                                      
@@ -198,7 +214,7 @@ BEGIN
     -- update the Ingredients table and set a specific ingredient
     UPDATE	recipes
     set prep_time = cTime
-    WHERE recipe_ID = recipeID;
+    WHERE recipe_id = recipeID;
     
     SELECT 'Cook time update correctly!!';
                                      
@@ -214,7 +230,7 @@ BEGIN
     -- update the Ingredients table and set a specific ingredient
     UPDATE	recipes
     set difficulty_level = dlevel
-    WHERE recipe_ID = recipeID;
+    WHERE recipe_id = recipeID;
     
     SELECT 'Difficult level update correctly!!';
                                      
@@ -230,7 +246,7 @@ BEGIN
     -- update the Ingredients table and set a specific ingredient
     UPDATE	recipes
     set calories_per_serving = cal
-    WHERE recipe_ID = recipeID;
+    WHERE recipe_id = recipeID;
     
     SELECT 'Serving Calories update correctly!!';
                                      
@@ -246,7 +262,7 @@ BEGIN
     -- update the Ingredients table and set a specific ingredient
     UPDATE	recipes
     set vegan = veg
-    WHERE recipe_ID = recipeID;
+    WHERE recipe_id = recipeID;
     
     SELECT 'Vegan update correctly!!';
                                      
@@ -263,7 +279,7 @@ BEGIN
     -- update the Ingredients table and set a specific ingredient
     UPDATE	recipes
     set low_carb = carb
-    WHERE recipe_ID = recipeID;
+    WHERE recipe_id = recipeID;
     
     SELECT 'Low carb update correctly!!';
                                      
@@ -281,7 +297,7 @@ CREATE PROCEDURE delete_recipe (IN recipeID int)
 BEGIN
      -- delete a recipe
     DELETE FROM recipes
-    WHERE recipe_ID = recipeID;
+    WHERE recipe_id = recipeID;
     
     SELECT 'Recipe was delete correctly!!';
                                    

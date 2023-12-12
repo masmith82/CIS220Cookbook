@@ -29,10 +29,10 @@ SELECT
 FROM
     user u
 JOIN
-    user_has_ingredients ui ON u.user_ID = ui.user_id
+    user_has_ingredients ui ON u.user_id = ui.user_id
 JOIN
     ingredients i ON ui.ingredient_id = i.ingredient_id
-WHERE u.user_ID = user_id;
+WHERE u.user_id = user_id;
 
 END $$
 DELIMITER ;
@@ -58,17 +58,11 @@ USE cookbook$$
 CREATE PROCEDURE insert_ingredient (IN i_name Varchar(100), IN cost float(10,2), IN veg TINYINT(1), IN carb TINYINT(1))
 -- define the procedure body
 BEGIN
-	-- declare the ingredient_Id 
-	DECLARE new_ingredient INT;
-    
-    -- search the user id in the user table
-	SELECT MAX(ingredient_id) + 1 INTO new_ingredient
-	FROM ingredients;
-    
+  
 	-- insert the information in the table
-    INSERT INTO ingredients (ingredient_id, ingredient_name, cost_per, vegan, low_carb)
+    INSERT INTO ingredients (ingredient_name, cost_per, vegan, low_carb)
 VALUES
-    (new_ingredient,i_name,cost,veg,carb);
+    (i_name,cost,veg,carb);
     
 SELECT 'Ingredient add!!';
 END $$

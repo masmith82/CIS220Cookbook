@@ -1,6 +1,6 @@
 import mysql.connector
 import sys
-from cookbook_menus import validate_input
+from cookbook_menus import validate_input, validate_quantity
 
 # Database connection parameters
 HOSTNAME = "localhost"
@@ -65,169 +65,6 @@ def get_user_id(username):
 # DATABASE MANIPULATION FUNCTIONS #
 ###################################
 
-# Define the function to insert a new ingredient
-def insert_ingredient(id, name, cost, vegan, carb):
-    try:
-        cursor = connection.cursor()
-
-        query = """
-            INSERT INTO Ingredients (ingredient_id, name, cost, vegan, carb)
-            VALUES (%s, %s, %s, %s, %s)
-        """
-
-        # Validate user input before inserting
-        if not isinstance(id, int) or id <= 0:
-            raise ValueError("Invalid user ID")
-        if not name or not name.strip():
-            raise ValueError("Invalid name")
-
-        # Execute the query with user-provided data
-        cursor.execute(query, (id,name, cost, vegan, carb))
-
-        # Commit the changes
-        connection.commit()
-    
-    except Exception as error:
-        print(f"Error inserting ingredient: {error}")
-        return None
-
-
-# Define the function to set_ingredient_name 
-def set_ingredient_name( ingredientID, i_name):
-
-    try:
-        cursor = connection.cursor()
-
-        # Execute the stored procedure
-        cursor.callproc("set_ingredient_name", (ingredientID, i_name))
-
-        # Fetch the result
-        result = cursor.fetchone()
-
-        # Commit the changes and close the connection
-        connection.commit()
-
-        # Return the result
-        #return result[0]
-    except Exception as error:
-        print(f"Error setting the ingredient name: {error}")
-
-# Define the function to set ingredient cost  
-def set_cost_ingredient( ingredientID, cost):
-
-    try:
-        # Connect to the database
-        connection = mysql.connector.connect(
-            host=HOSTNAME, user=USERNAME, password=PASSWORD, database= DATABASE
-        )
-        cursor = connection.cursor()
-
-        # Execute the stored procedure
-        cursor.callproc("set_cost_ingredient", (ingredientID, cost))
-
-        # Fetch the result
-        result = cursor.fetchone()
-
-        # Commit the changes and close the connection
-        connection.commit()
-
-        # Return the result
-        #return result[0]
-    except Exception as error:
-        print(f"Error setting the ingredient cost: {error}")
-
-
-# Define the function to set vegan ingredient  
-def set_vegan_ingredient( ingredientID, vegan):
-
-    try:
-        # Connect to the database
-        connection = mysql.connector.connect(
-            host=HOSTNAME, user=USERNAME, password=PASSWORD, database= DATABASE
-        )
-        cursor = connection.cursor()
-
-        # Execute the stored procedure
-        cursor.callproc("set_vegan_ingredient", (ingredientID, vegan))
-
-        # Fetch the result
-        result = cursor.fetchone()
-
-        # Commit the changes and close the connection
-        connection.commit()
-
-        # Return the result
-        return result[0]
-    except Exception as error:
-        print(f"Error setting the vegan ingredient: {error}")
-
-# Define the function to set carb ingredient  
-def set_carb_ingredient( ingredientID, carb):
-
-    try:
-        cursor = connection.cursor()
-
-        # Execute the stored procedure
-        cursor.callproc("set_carb_ingredient", (ingredientID, carb))
-
-        # Fetch the result
-        result = cursor.fetchone()
-
-        # Commit the changes and close the connection
-        connection.commit()
-
-        # Return the result
-        return result[0]
-    except Exception as error:
-        print(f"Error setting the carb ingredient: {error}")
-
-# Define the function to set carb ingredient  
-def delete_ingredient( ingredientID):
-
-    try:
-        cursor = connection.cursor()
-
-        # Execute the stored procedure
-        cursor.callproc("delete_ingredient", (ingredientID))
-
-        # Fetch the result
-        result = cursor.fetchone()
-
-        # Commit the changes and close the connection
-        connection.commit()
-
-    except Exception as error:
-        print(f"Error deleting ingredient: {error}")
-
-
-# Define the function to insert recipe steps
-def insert_recipe_step(recipe_id, step_number, ingredient_id, quantity, instructions):
-
-    try:
-        cursor = connection.cursor()
-
-        query = """
-            INSERT INTO Recipe_Steps (recipe_id, step_number, ingredient_id, quantity, instructions)
-            VALUES (%s, %s, %s, %s, %s)
-        """
-
-        # Validate user input before inserting
-        if not isinstance(recipe_id, int) or recipe_id <= 0:
-            raise ValueError("Invalid user ID")
-        if not ingredient_id or not ingredient_id.strip():
-            raise ValueError("Invalid first name")
-        # ... (Perform similar validation for other inputs)
-
-        # Execute the query with user-provided data
-        cursor.execute(query, (recipe_id, step_number, ingredient_id, quantity, instructions))
-
-        # Commit the changes and close the connection
-        connection.commit()
-
-    except Exception as error:
-        print(f"Error inserting recipe step: {error}")
-        return None
-
 # show's ingredients in a user's stock
 def show_user_ingredients(current_user):
     cursor = connection.cursor()
@@ -246,6 +83,8 @@ def add_ingredient_to_stock(current_user):
     ingredient_id = validate_input(input("Enter the ingredient ID to add: "))
     ingedient_quantity = validate_input(input("Enter the quantity to add: "))
     cursor.callproc('add_ingredient_to_stock', (current_user, ingredient_id, ingedient_quantity))
+    connection.commit()
+    print("\n")
 
 # Define the function to show the ingredients
 def show_ingredients():
@@ -270,26 +109,230 @@ def parse_bool(value):
         return "N"
 
 # Define the function to insert a new ingredient
-def insert_recipe(id, name, p_time, c_time, diff_level, cal, vegan, carb):
+def insert_ingredient(name, cost, vegan, carb):
+    try:
+        cursor = connection.cursor()
+
+        query = """
+            INSERT INTO Ingredients (ingredient_name, cost_per, vegan, low_carb)
+            VALUES (%s, %s, %s, %s)
+        """
+
+        if not name or not name.strip():
+            raise ValueError("Invalid name")
+
+        # Execute the query with user-provided data
+        cursor.execute(query, (name, cost, vegan, carb))
+
+        # Commit the changes
+        connection.commit()
+        print("\nIngredient created successfully!\n")
+    
+    except Exception as error:
+        print(f"Error inserting ingredient: {error}")
+        return None
+
+
+# Define the function to set_ingredient_name 
+def set_ingredient_name( ingredient_id, i_name):
+    try:
+        cursor = connection.cursor()
+        # Execute the stored procedure
+        cursor.callproc("set_ingredient_name", (ingredient_id, i_name))
+
+        # Commit the changes and close the connection
+        connection.commit()
+
+    except Exception as error:
+        print(f"Error setting the ingredient name: {error}")
+
+# Define the function to set ingredient cost  
+def set_cost_ingredient( ingredient_id, cost):
+
+    try:
+        # Connect to the database
+        connection = mysql.connector.connect(
+            host=HOSTNAME, user=USERNAME, password=PASSWORD, database= DATABASE
+        )
+        cursor = connection.cursor()
+
+        # Execute the stored procedure
+        cursor.callproc("set_cost_ingredient", (ingredient_id, cost))
+
+        # Fetch the result
+        result = cursor.fetchone()
+
+        # Commit the changes and close the connection
+        connection.commit()
+
+        # Return the result
+        #return result[0]
+    except Exception as error:
+        print(f"Error setting the ingredient cost: {error}")
+
+
+# Define the function to set vegan ingredient  
+def set_vegan_ingredient( ingredient_id, vegan):
+
+    try:
+        # Connect to the database
+        connection = mysql.connector.connect(
+            host=HOSTNAME, user=USERNAME, password=PASSWORD, database= DATABASE
+        )
+        cursor = connection.cursor()
+
+        # Execute the stored procedure
+        cursor.callproc("set_vegan_ingredient", (ingredient_id, vegan))
+
+        # Fetch the result
+        result = cursor.fetchone()
+
+        # Commit the changes and close the connection
+        connection.commit()
+
+        # Return the result
+        return result[0]
+    except Exception as error:
+        print(f"Error setting the vegan ingredient: {error}")
+
+# Define the function to set carb ingredient  
+def set_carb_ingredient( ingredient_id, carb):
+
+    try:
+        cursor = connection.cursor()
+
+        # Execute the stored procedure
+        cursor.callproc("set_carb_ingredient", (ingredient_id, carb))
+
+        # Fetch the result
+        result = cursor.fetchone()
+
+        # Commit the changes and close the connection
+        connection.commit()
+
+        # Return the result
+        return result[0]
+    except Exception as error:
+        print(f"Error setting the carb ingredient: {error}")
+
+# Define the function to set carb ingredient  
+def delete_ingredient( ingredient_id):
+    try:
+        cursor = connection.cursor()
+
+        # Execute the stored procedure
+        cursor.callproc("delete_ingredient", (ingredient_id,))
+
+        # Fetch the result
+        result = cursor.fetchone()
+
+        # Commit the changes and close the connection
+        connection.commit()
+
+    except Exception as error:
+        print(f"Error deleting ingredient: {error}")
+
+
+def list_recipes():
+        cursor = connection.cursor()
+
+        query = """
+            SELECT recipe_id, recipe_name FROM recipes
+        """
+        
+        cursor.execute(query)
+        for row in cursor:
+            print(f"{row[0]:<3} - {row[1]:<20}")
+
+def list_recipe_detail(recipe_id):
+    cursor = connection.cursor()
+
+    query = """
+        SELECT recipe_name, difficulty_level, prep_time, cook_time, calories_per_serving, vegan, low_carb
+        FROM recipes
+        WHERE recipe_id = %s      
+    """     
+    cursor.execute(query, (recipe_id,))
+    if cursor.rowcount == 0:
+        print("No recipe steps found")
+        return None
+    for row in cursor:
+        print(f"\n{row[0]:<3}")
+        print(f"Difficulty: {'★ ' * int(row[1])}")
+        print(f"Prep Time: {row[2]} minutes | Cook Time: {row[3]} minutes")
+        print(f"Calories per serving: {row[4]}")
+        print(f"Vegan: {parse_bool(row[5])} | Low Carb: {parse_bool(row[6])}")
+        print("\n")
+        get_recipe_steps(recipe_id)
+
+def get_recipe_steps(recipe_id):
+    cursor = connection.cursor()
+    query = """
+        SELECT step_number, i.ingredient_name, quantity, instructions
+        FROM recipe_steps rs
+        INNER JOIN ingredients i ON rs.ingredient_id = i.ingredient_id
+        WHERE recipe_id = %s
+    """
+    cursor.execute(query, (recipe_id,))
+    step = 1
+    for row in cursor:
+        if row[1] == None:          # if no ingredient is found, set the name to None
+            row[1] = "None"
+        print(f"Step {step}:\n=======\nIngredients used: {row[1]} x {row[2]}\nInstructions: {row[3]}")
+        step += 1                    # increment the step number, this is because step_number in the database my not be sequential due to how AUTO_INCREMENT works
+        
+def add_recipe_step(recipe_id):
+    cursor = connection.cursor()
+    list_recipe_detail(recipe_id)
+    ingredient_quantity = 0         # initialize the ingredient quantity to 0                   
+    ingredient_id = validate_input(input("Enter the ingredient ID to add: "))
+    if ingredient_id != None:       # if the ingredient id is valid, ask for the quantity
+        ingredient_quantity = validate_quantity(input("Enter the quantity to add: "))
+    instructions = input("Enter the instructions: ")
+
+    query = """
+        INSERT INTO recipe_steps (recipe_id, ingredient_id, quantity, instructions)
+        VALUES (%s, %s, %s, %s)
+    """
+
+    cursor.execute(query, (recipe_id, ingredient_id, ingredient_quantity, instructions))
+    connection.commit()
+    print("\n")
+
+def delete_recipe_step(recipe_id, step_number):
+    try:
+        cursor = connection.cursor()
+        step_number = validate_input(input("Enter the step number to delete: "))
+        query = """
+            DELETE FROM recipe_steps
+            WHERE recipe_id = %s AND step_number = %s
+        """
+        cursor.execute(query, (recipe_id, step_number))
+        connection.commit()
+        print("\n")
+        
+    except Exception as error:
+        print(f"Error deleting recipe step: {error}")
+    
+# Define the function to insert a new ingredient
+def insert_recipe(name, p_time, c_time, diff_level, cal, vegan, carb):
     try:
         # Connect to the database
         cursor = connection.cursor()
 
         query = """
-            INSERT INTO Recipe (recipe_id, recipe_name, p_time, c_time, diff_level, cal, vegan, carb)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO recipes (recipe_name, prep_time, cook_time, difficulty_level, calories_per_serving, vegan, low_carb)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
 
-        # Validate user input before inserting
-        if not isinstance(id, int) or id <= 0:
-            raise ValueError("Invalid user ID")
         if not name or not name.strip():
             raise ValueError("Invalid first name")
         # ... (Perform similar validation for other inputs)
 
         # Execute the query with user-provided data
-        cursor.execute(query, (id, name, p_time, c_time, diff_level, cal, vegan, carb))
+        cursor.execute(query, (name, p_time, c_time, diff_level, cal, vegan, carb))
         connection.commit()
+        print("\nRecipe created successfully!\n")
 
     except Exception as error:
         print(f"Error inserting recipe: {error}")
@@ -315,7 +358,6 @@ def set_recipe_name(id, name):
 
 # set the prep time
 def set_prepTime_recipes(id, p_time):
-
     try:
         cursor = connection.cursor()
 
