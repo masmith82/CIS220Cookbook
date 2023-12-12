@@ -2,28 +2,55 @@ import sys
 from cookbook_menus import *
 from cookbook_functions import *
 
+current_user = None         # store current user_id for this session
 
+# login the user
 def login():
     # We request the userID
     userID = input("Enter your userID: ")
-    # We request the nickname
-    nickname = input("Enter your nickname: ")
+    
+    if not user_exists(userID):
+        print("User does not exist.")
+        return
+    
+    # We request the password
+    passw = input("Enter your password: ")
+
+    if not verify_password(userID, passw):
+        print("Invalid password.")
+        return
 
     # code to verify the user is here ----------------------------------------------
 
-    if userID and nickname:
+    # if user is valid we show the user menu
+    if userID and passw:
+        print("\nLogin successful. \nWelcome, " + userID + "!\n")
+        global current_user
+        current_user= get_user_id(userID)
         user_menu()
+
+
+def create_new_user():
+    #new_userID = int(input("Ingrese el id: "))     # we should let the databas assign the user ID
+    new_first_name = input("Enter your first name: ")
+    new_last_name = input("Enter your last name: ")
+    new_email = input("Enter your email: ")
+    new_username = input("Enter your username: ")
+    new_password = input("Choose a password: ")
+    value = create_user(new_first_name, new_last_name, new_email, new_username, new_password)
 
 # user menu, displays after login
 def user_menu():
     while True:
         show_user_menu()
-        option = validate_input(input("Enter an option: "))     # get input
+        option = validate_input(input("\nEnter an option: "))     # get input
         
         if option == 1:
             ingredient_menu()               # go to ingredients menu          
         elif option == 2:
             recipe_menu()                   # go to recipe menu
+        elif option == 3:
+            break                           # exit to main menu
 
 # menu to manage ingredients
 def ingredient_menu():
@@ -257,12 +284,7 @@ while True:
     
     # new user
     elif option == 2:
-        #new_userID = int(input("Ingrese el id: "))     # we should let the databas assign the user ID
-        new_first_name = input("Enter your first name: ")
-        new_last_name = input("Enter your last name: ")
-        new_email = input("Enter your email: ")
-        new_username = input("Enter your username: ")
-        value = create_user(new_first_name, new_last_name, new_email, new_username)
+        create_new_user()
 
     # list users
     elif option == 3:

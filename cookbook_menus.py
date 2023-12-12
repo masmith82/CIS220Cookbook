@@ -29,7 +29,7 @@ def show_principal_menu():
 
 def show_user_menu():
 # We define a function to display the user menu
-    print("** MENU **")
+    print("** MAIN USER MENU **")
     print("1) Ingredients")
     print("2) Recipes")
     print("3) Steps")
@@ -37,7 +37,7 @@ def show_user_menu():
 
 # We define a function to display the ingredients menu
 def show_ingredients_MENU():
-  print("** MENU **")
+  print("** INGREDIENTS MENU **")
   print("1) Add ingredient")
   print("2) Modify ingredients")
   print("3) Delete ingredints")
@@ -46,7 +46,7 @@ def show_ingredients_MENU():
 
 # We define a function to display the recipe menu
 def show_recipe_MENU():
-  print("** MENU **")
+  print("** RECIPE MENU **")
   print("1) Add recipe")
   print("2) Modify recipe")
   print("3) Delete recipe")
@@ -55,7 +55,7 @@ def show_recipe_MENU():
 
 # We define a function to display the modify ingredients menu
 def show_modify_ingredients_MENU():
-  print("** MODIFY MENU **")
+  print("** MODIFY INGREDIENTS MENU **")
   print("1) Modify the ingredient name")
   print("2) Modify the ingredient cost")
   print("3) Modify the ingredient vegan")
@@ -64,7 +64,7 @@ def show_modify_ingredients_MENU():
 
 # We define a function to display the modify recipe menu
 def show_modify_recipe_MENU():
-  print("** MODIFY MENU **")
+  print("** MODIFY RECIPE MENU **")
   print("1) Modify the recipe name")
   print("2) Modify the recipe prep_time")
   print("3) Modify the recipe cook_time")

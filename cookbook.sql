@@ -9,16 +9,16 @@ DROP TABLE IF EXISTS user;
 
 -- create user table
 CREATE TABLE user (
-    user_ID INT PRIMARY KEY,
+    user_ID INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(50),
     last_name VARCHAR(50),
     email_address VARCHAR(100) UNIQUE,
     username VARCHAR(50) UNIQUE,
-    pass VARCHAR(50)
+    passw VARCHAR(50)
 );
 
 -- insert dummy users
-INSERT INTO user (user_ID, first_name, last_name, email_address, username, pass)
+INSERT INTO user (user_ID, first_name, last_name, email_address, username, passw)
 VALUES
     (1, 'John', 'Doe', 'john.doe@email.com', 'jd', 'password'),
     (2, 'Jane', 'Smith', 'jane.smith@email.com', 'js_smith_1990', 'password'),

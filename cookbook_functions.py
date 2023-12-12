@@ -4,7 +4,7 @@ import sys
 # Database connection parameters
 HOSTNAME = "localhost"
 USERNAME = "root"
-PASSWORD = None
+PASSWORD = "MJw!0TeN!0"
 DATABASE = "cookbook"
 
 # global variable to hold the database connection
@@ -26,7 +26,39 @@ def connect() -> mysql.connector.connect:
         return connection
     except Exception as error:
         print(f"Error connecting to the database: {error}")
-        sys.exit(1)
+        sys.exit()
+
+connection = connect()
+
+###################
+# USER VALIDATION #
+###################
+
+# Called from login(). Check if the user exists in the database
+def user_exists(username):
+    cursor = connection.cursor()
+    query = "SELECT COUNT(*) FROM user WHERE username = %s"
+    cursor.execute(query, (username,))
+    result = cursor.fetchone()
+    return result[0] > 0        # Return true if the user exists
+
+# Called from login(). Verify the password for the given username
+def verify_password(username, password):
+    cursor = connection.cursor()
+    query = "SELECT passw FROM user WHERE username = %s"
+    cursor.execute(query, (username,))
+    result = cursor.fetchone()
+    if str(result[0]) == password:
+        return True
+    else:
+        return False
+    
+def get_user_id(username):
+    cursor = connection.cursor()
+    query = "SELECT user_id FROM user WHERE username = %s"
+    cursor.execute(query, (username,))
+    result = cursor.fetchone()
+    return result[0]
 
 ###################################
 # DATABASE MANIPULATION FUNCTIONS #
@@ -38,7 +70,7 @@ def insert_ingredient(id, name, cost, vegan, carb):
         cursor = connection.cursor()
 
         query = """
-            INSERT INTO Ingredients (id,name, cost, vegan, carb)
+            INSERT INTO Ingredients (ingredient_id, name, cost, vegan, carb)
             VALUES (%s, %s, %s, %s, %s)
         """
 
@@ -51,12 +83,8 @@ def insert_ingredient(id, name, cost, vegan, carb):
         # Execute the query with user-provided data
         cursor.execute(query, (id,name, cost, vegan, carb))
 
-        # Commit the changes and close the connection
+        # Commit the changes
         connection.commit()
-        connection.close()
-
-        # Return the result
-        #return result[0]
     
     except Exception as error:
         print(f"Error inserting ingredient: {error}")
@@ -81,7 +109,6 @@ def set_ingredient_name( ingredientID, i_name):
 
         # Commit the changes and close the connection
         connection.commit()
-        connection.close()
 
         # Return the result
         #return result[0]
@@ -106,7 +133,6 @@ def set_cost_ingredient( ingredientID, cost):
 
         # Commit the changes and close the connection
         connection.commit()
-        connection.close()
 
         # Return the result
         #return result[0]
@@ -132,7 +158,6 @@ def set_vegan_ingredient( ingredientID, vegan):
 
         # Commit the changes and close the connection
         connection.commit()
-        connection.close()
 
         # Return the result
         return result[0]
@@ -157,7 +182,6 @@ def set_carb_ingredient( ingredientID, carb):
 
         # Commit the changes and close the connection
         connection.commit()
-        connection.close()
 
         # Return the result
         return result[0]
@@ -168,10 +192,6 @@ def set_carb_ingredient( ingredientID, carb):
 def delete_ingredient( ingredientID):
 
     try:
-        # Connect to the database
-        connection = mysql.connector.connect(
-            host=HOSTNAME, user=USERNAME, password=PASSWORD, database= DATABASE
-        )
         cursor = connection.cursor()
 
         # Execute the stored procedure
@@ -182,10 +202,7 @@ def delete_ingredient( ingredientID):
 
         # Commit the changes and close the connection
         connection.commit()
-        connection.close()
 
-        # Return the result
-        return result[0]
     except Exception as error:
         print(f"Error deleting ingredient: {error}")
 
@@ -217,10 +234,7 @@ def insert_recipe_step(recipe_id, step_number, ingredient_id, quantity, instruct
 
         # Commit the changes and close the connection
         connection.commit()
-        connection.close()
 
-        # Return the result
-        #return result[0]
     except Exception as error:
         print(f"Error inserting recipe step: {error}")
         return None
@@ -235,7 +249,7 @@ def show_ingredients():
 
     # call the ingredients from the cookbook
 
-    cursor.execute("SELECT * FROM Ingredients")
+    cursor.execute("SELECT * FROM ingredients")
 
     # Iterar sobre los resultados
     for row in cursor:
@@ -246,21 +260,16 @@ def show_ingredients():
         print(f"vegan: {row[3]}")
         print(f"carb: {row[4]}\n")
 
-    # close the conection
-    connection.close()
 
 # Define the function to insert a new ingredient
 def insert_recipe(id, name, p_time, c_time, diff_level, cal, vegan, carb):
 
     try:
         # Connect to the database
-        connection = mysql.connector.connect(
-            host=HOSTNAME, user=USERNAME, password=PASSWORD, database= DATABASE
-        )
         cursor = connection.cursor()
 
         query = """
-            INSERT INTO Recipe (id, name, p_time, c_time, diff_level, cal, vegan, carb)
+            INSERT INTO Recipe (recipe_id, recipe_name, p_time, c_time, diff_level, cal, vegan, carb)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """
 
@@ -273,13 +282,8 @@ def insert_recipe(id, name, p_time, c_time, diff_level, cal, vegan, carb):
 
         # Execute the query with user-provided data
         cursor.execute(query, (id, name, p_time, c_time, diff_level, cal, vegan, carb))
-
-        # Commit the changes and close the connection
         connection.commit()
-        connection.close()
 
-        # Return the result
-        #return result[0]
     except Exception as error:
         print(f"Error inserting recipe: {error}")
         return None
@@ -302,10 +306,7 @@ def set_recipe_name(id, name):
 
         # Commit the changes and close the connection
         connection.commit()
-        connection.close()
 
-        # Return the result
-        return result[0]
     except Exception as error:
         print(f"Error seting recipe name: {error}")
         return None
@@ -326,12 +327,9 @@ def set_prepTime_recipes(id, p_time):
         # Fetch the result
         result = cursor.fetchone()
 
-        # Commit the changes and close the connection
+        # Commit the changes
         connection.commit()
-        connection.close()
 
-        # Return the result
-        return result[0]
     except Exception as error:
         print(f"Error seting prep time in recipe: {error}")
         return None
@@ -341,10 +339,6 @@ def set_prepTime_recipes(id, p_time):
 def set_cookTime_recipes(id, c_time):
 
     try:
-        # Connect to the database
-        connection = mysql.connector.connect(
-            host=HOSTNAME, user=USERNAME, password=PASSWORD, database= DATABASE
-        )
         cursor = connection.cursor()
 
         # Execute the stored procedure
@@ -355,10 +349,8 @@ def set_cookTime_recipes(id, c_time):
 
         # Commit the changes and close the connection
         connection.commit()
-        connection.close()
 
-        # Return the result
-        return result[0]
+
     except Exception as error:
         print(f"Error seting cook time in recipe: {error}")
         return None
@@ -367,10 +359,6 @@ def set_cookTime_recipes(id, c_time):
 def set_diffLevel_recipes(id, level):
 
     try:
-        # Connect to the database
-        connection = mysql.connector.connect(
-            host=HOSTNAME, user=USERNAME, password=PASSWORD, database= DATABASE
-        )
         cursor = connection.cursor()
 
         # Execute the stored procedure
@@ -381,10 +369,7 @@ def set_diffLevel_recipes(id, level):
 
         # Commit the changes and close the connection
         connection.commit()
-        connection.close()
 
-        # Return the result
-        return result[0]
     except Exception as error:
         print(f"Error seting diff level in recipe: {error}")
         return None
@@ -393,10 +378,6 @@ def set_diffLevel_recipes(id, level):
 def set_calories_per_serving_recipes(id, cal):
 
     try:
-        # Connect to the database
-        connection = mysql.connector.connect(
-            host=HOSTNAME, user=USERNAME, password=PASSWORD, database= DATABASE
-        )
         cursor = connection.cursor()
 
         # Execute the stored procedure
@@ -407,10 +388,7 @@ def set_calories_per_serving_recipes(id, cal):
 
         # Commit the changes and close the connection
         connection.commit()
-        connection.close()
 
-        # Return the result
-        return result[0]
     except Exception as error:
         print(f"Error seting calories in recipe: {error}")
         return None
@@ -419,10 +397,6 @@ def set_calories_per_serving_recipes(id, cal):
 def set_vegan_recipes(id, veg):
 
     try:
-        # Connect to the database
-        connection = mysql.connector.connect(
-            host=HOSTNAME, user=USERNAME, password=PASSWORD, database= DATABASE
-        )
         cursor = connection.cursor()
 
         # Execute the stored procedure
@@ -433,9 +407,7 @@ def set_vegan_recipes(id, veg):
 
         # Commit the changes and close the connection
         connection.commit()
-        connection.close()
 
-        # Return the result
         return result[0]
     except Exception as error:
         print(f"Error seting vegan in recipe: {error}")
@@ -446,9 +418,6 @@ def set_carb_recipes(id, carb):
 
     try:
         # Connect to the database
-        connection = mysql.connector.connect(
-            host=HOSTNAME, user=USERNAME, password=PASSWORD, database= DATABASE
-        )
         cursor = connection.cursor()
 
         # Execute the stored procedure
@@ -459,22 +428,14 @@ def set_carb_recipes(id, carb):
 
         # Commit the changes and close the connection
         connection.commit()
-        connection.close()
-
-        # Return the result
-        return result[0]
+ 
     except Exception as error:
         print(f"Error seting carb in recipe: {error}")
         return None
 
 # delete a recipe
 def delete_recipe(id):
-
     try:
-        # Connect to the database
-        connection = mysql.connector.connect(
-            host=HOSTNAME, user=USERNAME, password=PASSWORD, database= DATABASE
-        )
         cursor = connection.cursor()
 
         # Execute the stored procedure
@@ -485,49 +446,42 @@ def delete_recipe(id):
 
         # Commit the changes and close the connection
         connection.commit()
-        connection.close()
 
-        # Return the result
-        return result[0]
     except Exception as error:
         print(f"Error delete a recipe: {error}")
         return None
 
 # Define the function to insert a new ingredient
-def create_user(first_name, last_name, email_address, username):
+def create_user(first_name, last_name, email_address, username, passw = "password"):
     try:
-        # Connect to the database
-        connection = mysql.connector.connect(
-            host=HOSTNAME, user=USERNAME, password=PASSWORD, database= DATABASE
-        )
+        print("Creating")
+
         cursor = connection.cursor()
 
         query = """
-            INSERT INTO User (first_name, last_name, email_address, username)
-            VALUES (%s, %s, %s, %s)
+            INSERT INTO User (first_name, last_name, email_address, username, passw)
+            VALUES (%s, %s, %s, %s, %s)
         """
         # Validate user input before inserting
         if not first_name or not first_name.strip():
-            raise ValueError("Invalid first name")
+            raise ValueError("Invalid name")
         # ... (Perform similar validation for other inputs)
 
         # Execute the query with user-provided data
-        cursor.execute(query, (first_name, last_name, email_address, username))
+        cursor.execute(query, (first_name, last_name, email_address, username, passw))
         # Commit the changes and close the connection
         connection.commit()
-        connection.close()
+        print("User created successfully!")
 
-        # Return the result
-        #return result[0]
     except Exception as error:
-        #print(f"Error creating a new user: {error}")
+        print(f"Error creating a new user: {error}")
         return None
 
 def show_user():
     cursor = connection.cursor()
 
     # Ejecutar la consulta
-    cursor.execute("SELECT * FROM User")
+    cursor.execute("SELECT * FROM user")
 
     # Iterar sobre los resultados
     for row in cursor:
@@ -537,6 +491,3 @@ def show_user():
         print(f"last Name: {row[2]}")
         print(f"Email: {row[3]}")
         print(f"Username: {row[4]}\n")
-
-    # Cerrar la conexión
-    connection.close()
