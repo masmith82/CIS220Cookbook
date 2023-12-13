@@ -29,6 +29,14 @@ def connect() -> mysql.connector.connect:
         print(f"Error connecting to the database: {error}")
         sys.exit()
 
+def disconnect():
+    global connection
+    try:
+        connection.close()
+        print("Connection closed successfully!")
+    except Exception as error:
+        print(f"Error closing the connection: {error}")
+        sys.exit()
 
 ###################
 # USER VALIDATION #

@@ -340,4 +340,5 @@ while True:
         show_user()
 
     elif option == 4:
+        disconnect()
         sys.exit()
